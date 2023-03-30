@@ -17,7 +17,7 @@ old_library=''
 inherited_linker_flags=' -pthread'
 
 # Libraries that this one depends upon.
-dependency_libs=' -L/usr/neurotools/nrn/neuron_install/nrn/x86_64/lib /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libnrnoc.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/liboc.la -lX11 /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libmemacs.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libnrnmpi.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libscopmath.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libsparse13.la -lreadline -lncurses /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libnrniv.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libivoc.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libneuron_gnu.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libmeschach.la /usr/neurotools/nrn/neuron_install/nrn/x86_64/lib/libsundials.la -lm -ldl'
+dependency_libs=' -L/home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libnrnoc.la /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/liboc.la -lX11 /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libmemacs.la /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libnrnmpi.la /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libscopmath.la /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libsparse13.la -lreadline -lncurses /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libnrniv.la -L/home/ifbdtk/nrn/nrn/mpi_install/mpich-3.2.1/src/mpl /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libivoc.la /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libneuron_gnu.la /home/ifbdtk/nrn/nrn/mpi_install/install/lib/libmpicxx.la /home/ifbdtk/nrn/nrn/mpi_install/install/lib/libmpi.la -lrt -lpthread /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libmeschach.la /home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib/libsundials.la -lm -ldl'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/usr/neurotools/nrn/neuron_install/nrn/x86_64/lib'
+libdir='/home/ifbdtk/nrn/nrn/neuron_install/nrn/x86_64/lib'

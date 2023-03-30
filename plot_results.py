@@ -5,11 +5,12 @@ from feedback_loop import FeedbackLoop
 import numpy as np
 import pandas as pd
 from plotting import plot_figure, plotting_calculator
+from bmtk.analyzer.compartment import plot_traces
 
 num = {
 'Bladaff' : 10,
-'EUSaff'  : 10,
 'PAGaff'  : 10,
+'EUSaff'  : 10,
 'IND'     : 10,
 'Hypo'    : 10,
 'INmplus' : 10,
@@ -40,9 +41,9 @@ def run(config_file=None,sim=None,conf=None):
     output_dir = conf.output_dir
     print(n_steps,dt)
 
-    spikes_df = pd.read_csv(os.path.join(output_dir,'spikes.csv'), sep=' ')
+    spikes_df = pd.read_csv(os.path.join(output_dir,'output/spikes.csv'), sep=' ')
     print(spikes_df['node_ids'].unique())
-    spike_trains = SpikeTrains.from_sonata(os.path.join(output_dir,'spikes.h5'))
+    spike_trains = SpikeTrains.from_sonata(os.path.join(output_dir,'output/spikes.h5'))
 
     #plotting
     window_size = 1000
@@ -62,3 +63,12 @@ if __name__ == '__main__':
     else:
         run(config_file='jsons/simulation_config.json')
 
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [5], title = 'Bladder Afferent Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [15], title = 'PAG Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [25], title = 'EUS Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [35], title = 'IND Afferent Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [55], title = 'INM+ Afferent Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [65], title = 'INM- Afferent Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [75], title = 'PGN Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [85], title = 'FB Membrane Voltage', show_legend = False)
+    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [105], title = 'MPG Membrane Voltage', show_legend = False)

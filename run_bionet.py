@@ -47,7 +47,7 @@ def run(config_file):
     sim.add_mod(fbmod)  # Attach the above module to the simulator.
     sim.run()
 
-    fbmod.save_aff(conf.output_dir)
+    #fbmod.save_aff(conf.output_dir)
     plot_results.run(sim=sim,conf=conf)
 
 if __name__ == '__main__':
