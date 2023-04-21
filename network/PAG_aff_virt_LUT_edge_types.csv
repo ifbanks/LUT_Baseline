@@ -1,2 +1,2 @@
-edge_type_id target_query source_query target_sections delay dynamics_params syn_weight model_template distance_range
-100 pop_name=='PAGaff' * ['somatic'] 2.0 AMPA_ExcToExc.json 0.02 Exp2Syn "[0.0, 300.0]"
+edge_type_id target_query source_query distance_range model_template target_sections delay syn_weight dynamics_params
+100 pop_name=='PAGaff' * "[0.0, 300.0]" Exp2Syn ['somatic'] 2.0 0.02 AMPA_ExcToExc.json

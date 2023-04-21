@@ -171,7 +171,7 @@ if __name__ == '__main__':
   # Change these for your needs 
   start    = 0   #ms
   mid    = 6000  #ms
-  duration = 10000 #ms
+  duration = 600000 #ms
   cells = np.arange(0,250)
 
   # # Create bladder afferent input spikes ----------------
@@ -189,8 +189,8 @@ if __name__ == '__main__':
   delay = 0 # ms 1000
   
   # (begin_void,end_void,v_time,v_vol) = bladder_rate(output_file, input_dir, fill, void, max_v, cells, start, mid + delay, duration)
-  begin_void = 1000
-  end_void= 60000
+  begin_void =  532000 #1000
+  end_void= 555000 #60000
   # Create Bladder afferent input spikes --------------------
   output_file = 'Blad_spikes.csv'
   input_dir = './'
@@ -202,7 +202,7 @@ if __name__ == '__main__':
   start = [0.0, begin_void - delay]
   end = [begin_void - delay , end_void + delay]
   
-  generate_poisson(output_file, input_dir, cells, hz, start, end, 'Blad_aff_virt')
+  #generate_poisson(output_file, input_dir, cells, hz, start, end, 'Blad_aff_virt')
   
   # Create EUS afferent input spikes --------------------
   output_file = 'EUS_spikes.csv'
@@ -212,8 +212,8 @@ if __name__ == '__main__':
               # (Habler et al. 1993)
               # Using high PAG firing rate of 15.0 Hz as high firing rate 
               # (Blok et al. 2000)
-  start = [0.0, 48000, 52000]
-  end = [48000 , 52000, 60000.0]
+  start = [0.0, 48000, 52000] #last term was 52000
+  end = [48000 , 52000, 600000.0] #last term was 60000
   
   generate_poisson(output_file, input_dir, cells, hz, start, end, 'EUS_aff_virt')
 

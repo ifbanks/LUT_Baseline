@@ -16,7 +16,7 @@ def plot_figure(means, stdevs, n_steps, dt, tstep=100, fbmod=None, savefig=True)
         ax2_1 = ax1_1.twinx()  # instantiate a second axes that shares the same x-axis
 
         color = 'tab:blue'
-        ax2_1.set_ylabel('Bladder Pressure (P) [cm H20]', color=color)  # we already handled the x-label with ax1
+        ax2_1.set_ylabel('Bladder Pressure (P) [mmHg]', color=color)  # we already handled the x-label with ax1
         ax2_1.plot(fbmod.times, fbmod.b_pres, color=color)
         ax2_1.tick_params(axis='y', labelcolor=color)
 
@@ -31,7 +31,8 @@ def plot_figure(means, stdevs, n_steps, dt, tstep=100, fbmod=None, savefig=True)
     plt.plot(t, means['Bladaff'][ind], color='b', marker='^', mfc='b', mec='b', label='Bladder Afferent')
     plt.plot(t, means['PGN'][ind], color='g', marker='o', mfc='g', mec='g', label='PGN')
     plt.plot(t, means['PAGaff'][ind], color='r', marker='D', mfc='r', mec='r', label='PAG')
-    #plt.plot(t, means['EUSmn'][ind], color='k', marker='D', mfc='k', mec='k', label='EUS Motor Neurons')
+    plt.plot(t, means['FB'][ind], color='k', marker='D', mfc='k', mec='k', label='FB')
+    plt.plot(t, means['IMG'][ind], color='y', marker='^', mfc='y', mec='y', label='IMG')
 
     plt.xlabel('Time (t) [ms]')
     plt.ylabel('Neuron Firing Rate (FR) [Hz]')
@@ -42,6 +43,7 @@ def plot_figure(means, stdevs, n_steps, dt, tstep=100, fbmod=None, savefig=True)
     plt.plot(t, means['INmminus'][ind], color='b', marker='^', mfc='b', mec='b', label='INm-')
     plt.plot(t, means['EUSmn'][ind], color='m', marker='^', mfc='m', mec='m', label='EUS Afferent')
     plt.plot(t, means['IND'][ind], color='r', marker='^', mfc='r', mec='r', label='IND')
+    plt.plot(t, means['INmplus'][ind], color='g', marker='^', mfc='g', mec='g', label='INm+')
 
     plt.xlabel('Time (t) [ms]')
     plt.ylabel('Neuron Firing Rate (FR) [Hz]')

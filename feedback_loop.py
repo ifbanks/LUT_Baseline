@@ -36,6 +36,12 @@ class FeedbackLoop(SimulatorMod):
         self.times = []
         self.b_vols = []
         self.b_pres = []
+        
+        self.void = False 
+        self.fill = True
+        
+        #self.voidtime
+        
 
     def _set_spike_detector(self, sim):
         for gid, cell in sim.net.get_local_cells().items():
@@ -91,20 +97,30 @@ class FeedbackLoop(SimulatorMod):
         #### BLADDER EQUATIONS ####    
     # Grill, et al. 2016
         def blad_vol(vol):
-            f = 1.5*20*vol - 10 #1.5*20*vol-10
+            f = 1.5*20*vol -10 #-10 #math.exp(48*vol-64.9) + 8
             return f
 
         # Grill function returning pressure in units of cm H20
 	    # Grill, et al. 2016
         def pressure(fr,v,x):
-            p = 0.2*fr + 1.0*v - x
+            p = 0.2*fr +  .5*v - .2*x + 12
             p = max(p,0.0)
             return p 
 
         # Grill function returning bladder afferent firing rate in units of Hz
 	    # Grill, et al. 2016
         def blad_aff_fr(p):
-            fr1 = -3.0E-08*p**5 + 1.0E-5*p**4 - 1.5E-03*p**3 + 7.9E-02*p**2 - 0.6*p
+            #fr1 = -3.0E-08*p**5 + 1.0E-5*p**4 - 1.5E-03*p**3 + 7.9E-02*p**2 - 0.6*p
+            p_mmHg = 0.735559*p
+            
+            if p_mmHg < 5:
+                fr1 = 0
+            elif p_mmHg < 10:
+                fr1 = 0.3*p_mmHg
+            elif p_mmHg < 30:
+                fr1 = 0.9*p_mmHg - 6
+            else:
+                fr1 = -3.0E-08*p**5 + 1.0E-5*p**4 - 1.5E-03*p**3 + 7.9E-02*p**2 - 0.6*p
             fr1 = max(fr1,0.0)
             return fr1 # Using scaling factor of 5 here to get the correct firing rate range
 
@@ -128,21 +144,58 @@ class FeedbackLoop(SimulatorMod):
         PGN_fr = max(2.0E-03*avg_fr**3 - 3.3E-02*avg_fr**2 + 1.8*avg_fr - 0.5, 0.0)
         io.log_info("Grill PGN fr = {0} Hz".format(PGN_fr))
 
-    ### STEP 2: Volume Calculations ###
-        v_init = 0.05       # TODO: get biological value for initial bladder volume
-        fill = 0.05 	 	# ml/min (Asselt et al. 2017)
+    ### STEP 2: Calculate IMG Firing Rate ###
+        io.log_info('IMG node_gid\t  Hz')
+        summed_fr = 0
+        for gid, tvec in self._spike_records.items():
+            # self._spike_records is a dictionary of the recorded spikes for each cell in the previous block of
+            #  time. When self._set_spike_detector() is called it will reset/empty the spike times. If you want to
+            #  print/save the actual spike-times you can call self._all_spikes[gid] += list(tvec)
+            if gid < 100 and gid > 89: #IMG gids 
+                n_spikes = len(tvec)
+                fr = n_spikes / (self._block_length_ms/1000.0)
+                summed_fr += fr
+                io.log_info(f'{gid}\t\t{fr}')
+        IMG_avg_fr = summed_fr / 10.0
+        io.log_info(f'IMG firing rate avg: {avg_fr} Hz')
+        
+    ### STEP 3: Volume Calculations ###
+        v_init = 0.0       # TODO: get biological value for initial bladder volume
+        fill = 1.75 	 	# ml/min (Asselt et al. 2017) 175 microL / min  Herrara 2010 for rat baseline 
         fill /= (1000 * 60) # Scale from ml/min to ml/ms
-        void = 4.6 	 		# ml/min (Streng et al. 2002)
+        void = 46.0 		# 4.344 ml/min approximated from Herrera 2010; can also use 4.6 ml/min (Streng et al. 2002)
         void /= (1000 * 60) # Scale from ml/min to ml/ms
-        max_v = 1.5 		# ml (Grill et al. 2019) #0.76
+        max_v = 1.65 		# 1.65 ml based of Herrara 2010; 1.5 ml (Grill et al. 2019) #0.76
         vol = v_init
         
-        # Filling
-        if self.pag_fr == 0 and vol < max_v:  #make this better
-            vol = fill*t*20 + v_init
+        prev_vol = v_init
+        block_len_ms = sim.nsteps_block*sim.dt #block length in milliseconds 
+        
+        # if first timestep where there are no recorded bladder volumes
+        if not self.b_vols:
+            prev_vol = v_init
+        else:
+            prev_vol = self.b_vols[-1]
+        
+        # To switch back from voiding to filling
+        if prev_vol == v_init:
+            self.void = False
+            self.fill = True 
+            
         # Voiding
-        elif self.pag_fr == 15:
-            vol = max_v - void*(60000-t)*100
+        if self.void:
+            vol = prev_vol - void*block_len_ms #max_v - void*(60000-t)*100
+        # Filling
+        elif self.fill and prev_vol < max_v:  #make this better
+            # if first timestep where there are no recorded bladder volumes 
+            if not self.b_vols:
+                vol = v_init
+            else:
+                vol = prev_vol + fill*block_len_ms #fill*t*20 + v_init Vinay
+        # If max volume reached
+        else:
+            vol = prev_vol 
+            
         
         # Maintain minimum volume
         if vol < v_init:
@@ -151,12 +204,12 @@ class FeedbackLoop(SimulatorMod):
         # Grill
         grill_vol = blad_vol(vol)
         
-    ### STEP 3: Pressure and Bladder Afferent FR Calculations ###
-        x = 50.0*(1.0/(1.0 + math.exp(75*(vol-0.67*max_v))) - 0.5)
-        p = pressure(PGN_fr, grill_vol, x)
+    ### STEP 4: Pressure and Bladder Afferent FR Calculations ###
+        x = 0 #50.0*(1.0/(1.0 + math.exp(75*(vol-0.67*max_v))) - 0.5)
+        p = pressure(PGN_fr, grill_vol, IMG_avg_fr)
         self.blad_fr = blad_aff_fr(p)
         
-    ### STEP 4: Update the input spikes each cell recieves in the next time block
+    ### STEP 5: Update the input spikes each cell recieves in the next time block
         # Calculate the start and stop times for the next block
         next_block_tstart = block_interval[1]*sim.dt
         next_block_tstop = next_block_tstart+self._block_length_ms
@@ -198,7 +251,12 @@ class FeedbackLoop(SimulatorMod):
         if self.blad_fr > 10:
             io.log_info("!!!PAG FIRING ACTIVATED!!!")
             self.pag_fr = 15
-              
+            
+            # To switch from filling to voiding
+            self.void = True 
+            self.fill = False 
+            
+            # PAG Firing Rate Update 
             psg = PoissonSpikeGenerator()
             psg.add(
                 node_ids= [0,1,2,3,4,5,6,7,8,9],
@@ -229,25 +287,57 @@ class FeedbackLoop(SimulatorMod):
                     nc = self._netcons[gid]
                     for t in spikes:
                         nc.event(t)
-        #else:
-            #self.pag_fr = 0
+            
+#            # EUS Aff Firing Rate Update
+#            psg = PoissonSpikeGenerator()
+#            psg.add(
+#                node_ids= [0,1,2,3,4,5,6,7,8,9],
+#                firing_rate= self.pag_fr,
+#                times=(next_block_tstart/1000.0 + 0.01, next_block_tstop/1000.0),
+#                population= 'EUSaff',
+#            )
+#        
+#            psg.add_spikes([0,1,2,3,4,5,6,7,8,9], [next_block_tstop, next_block_tstop, next_block_tstop, next_block_tstop, next_block_tstop, next_block_tstop, next_block_tstop,       next_block_tstop, next_block_tstop, next_block_tstop], population = "EUSaff")
+#            psg.to_csv("spikes_eus.csv")
+#
+#            for gid, cell in sim.net.get_local_cells().items():
+#                if gid < 30 and gid > 19:
+#                    spikes = psg.get_times(gid - 20, population='EUSaff')
+#                    spikes = np.sort(spikes)
+#                    #print("HEllo: \n {0}".format(spikes))
+#                    if len(spikes) == 0:
+#                        continue
+#
+#            # The next block of code is where we update the incoming/virtual spike trains for each cell, by adding
+#            # each spike to the cell's netcon (eg synapse). The only caveats is the spike-trains array must
+#            #  1. Have atleast one spike
+#            #  2. Be sorted
+#            #  3. first spike must occur after the delay.
+#            # Otherwise an error will be thrown.
+#                    self._spike_events[gid] = np.concatenate((self._spike_events[gid], spikes))
+#                    nc = self._netcons[gid]
+#                    for t in spikes:
+#                        nc.event(t)
+        else:
+            self.pag_fr = 0
 
         self._set_spike_detector(sim)
         pc.barrier()
         
-    ### STEP 5: Save Calculations ####
+    ### STEP 6: Save Calculations ####
+        p_mmHg = 0.735559*p
         self._prev_glob_press = self._glob_press
-        self._glob_press = p 
+        self._glob_press = p_mmHg
 
         #io.log_info('PGN firing rate = %.2f Hz' %fr)
-        io.log_info('Volume = %.2f ml' %vol)
-        io.log_info('Pressure = %.2f cm H20' %p)
+        io.log_info('Volume = %.4f ml' %vol)
+        io.log_info('Pressure = %.2f mmHg' %p_mmHg)
         io.log_info('Calculated bladder afferent firing rate for the next time step = {:.2f} Hz \n \n'.format(self.blad_fr))
 
         # Save values in appropriate lists
         self.times.append(t)
         self.b_vols.append(vol)
-        self.b_pres.append(p)
+        self.b_pres.append(p_mmHg)
 
     def finalize(self, sim):
         pass

@@ -47,7 +47,7 @@ def run(config_file=None,sim=None,conf=None):
 
     #plotting
     window_size = 1000
-    pops = ['Bladaff','PGN','PAGaff','EUSmn','INmminus','IND']
+    pops = ['Bladaff','PGN','PAGaff','EUSmn','INmminus','INmplus','IND', 'IMG', 'FB']
     windows = [window_size]*len(pops)
     means = {}
     stdevs = {}
@@ -63,12 +63,12 @@ if __name__ == '__main__':
     else:
         run(config_file='jsons/simulation_config.json')
 
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [5], title = 'Bladder Afferent Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [15], title = 'PAG Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [25], title = 'EUS Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [35], title = 'IND Afferent Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [55], title = 'INM+ Afferent Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [65], title = 'INM- Afferent Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [75], title = 'PGN Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [85], title = 'FB Membrane Voltage', show_legend = False)
-    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [105], title = 'MPG Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [5], title = 'Bladder Afferent Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [15], title = 'PAG Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [25], title = 'EUS Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [35], title = 'IND Afferent Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [55], title = 'INM+ Afferent Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [65], title = 'INM- Afferent Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [75], title = 'PGN Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [85], title = 'FB Membrane Voltage', show_legend = False)
+#    plot_traces(config_file = 'jsons/simulation_config.json', report_name = 'membrane_report', node_ids = [105], title = 'MPG Membrane Voltage', show_legend = False)
