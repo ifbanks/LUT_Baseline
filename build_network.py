@@ -213,7 +213,7 @@ conn = net.add_edges(source=net.nodes(pop_name='Bladaff'), target=net.nodes(pop_
 				
 conn.add_properties(names=['syn_weight', 'sec_id', 'sec_x'],
                     rule=conn_props,
-                    rule_params={'mu':10.0e-3,'sigma':1},
+                    rule_params={'mu':3.0e-3,'sigma':1},
                     dtypes=[np.float, np.int32, np.float])
 
  # Blad afferent --> Hypogastric (Hou et al. 2014)
@@ -228,7 +228,7 @@ conn = net.add_edges(source=net.nodes(pop_name='Bladaff'), target=net.nodes(pop_
 
 conn.add_properties(names=['syn_weight', 'sec_id', 'sec_x'],
                      rule=conn_props,
-                     rule_params={'mu':10.0e-3,'sigma':1},
+                     rule_params={'mu':10.0e-3,'sigma':1}, # was 10.0e-3
                      dtypes=[np.float, np.int32, np.float])
 
 # EUS afferent --> INd (Grill et al. 2016)
@@ -258,7 +258,7 @@ conn = net.add_edges(source=net.nodes(pop_name='PAGaff'), target=net.nodes(pop_n
 
 conn.add_properties(names=['syn_weight', 'sec_id', 'sec_x'],
                     rule=conn_props,
-                    rule_params={'mu':20.0e-3,'sigma':1},  # was 20.0e-3
+                    rule_params={'mu':5.0e-3,'sigma':1},  # was 20.0e-3
                     dtypes=[np.float, np.int32, np.float])
 
 # INd --> PGN (Grill et al. 2016)

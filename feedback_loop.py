@@ -97,30 +97,31 @@ class FeedbackLoop(SimulatorMod):
         #### BLADDER EQUATIONS ####    
     # Grill, et al. 2016
         def blad_vol(vol):
-            f = 1.5*20*vol -10 #-10 #math.exp(48*vol-64.9) + 8
+            f = 1.5*100*vol #- 1.5 #-10 #math.exp(48*vol-64.9) + 8
             return f
 
         # Grill function returning pressure in units of cm H20
 	    # Grill, et al. 2016
-        def pressure(fr,v,x):
-            p = 0.2*fr +  .5*v - .2*x + 12
+        def pressure(PGN,v,IMG):
+            p = 0.6*PGN +  1.0*v - 0.1*IMG + 9
+            print("p = 0.7*{0} + 7*{1} - 0.7*{2}".format(PGN, v, IMG))
             p = max(p,0.0)
             return p 
 
         # Grill function returning bladder afferent firing rate in units of Hz
 	    # Grill, et al. 2016
         def blad_aff_fr(p):
-            #fr1 = -3.0E-08*p**5 + 1.0E-5*p**4 - 1.5E-03*p**3 + 7.9E-02*p**2 - 0.6*p
-            p_mmHg = 0.735559*p
-            
-            if p_mmHg < 5:
-                fr1 = 0
-            elif p_mmHg < 10:
-                fr1 = 0.3*p_mmHg
-            elif p_mmHg < 30:
-                fr1 = 0.9*p_mmHg - 6
-            else:
-                fr1 = -3.0E-08*p**5 + 1.0E-5*p**4 - 1.5E-03*p**3 + 7.9E-02*p**2 - 0.6*p
+            fr1 = -3.0E-08*p**5 + 1.0E-5*p**4 - 1.5E-03*p**3 + 7.9E-02*p**2 - 0.6*p
+#            p_mmHg = 0.735559*p
+#            
+#            if p_mmHg < 5:
+#                fr1 = 0
+#            elif p_mmHg < 10:
+#                fr1 = 0.3*p_mmHg
+#            elif p_mmHg < 30:
+#                fr1 = 0.9*p_mmHg - 6
+#            else:
+#                fr1 = -3.0E-08*p**5 + 1.0E-5*p**4 - 1.5E-03*p**3 + 7.9E-02*p**2 - 0.6*p
             fr1 = max(fr1,0.0)
             return fr1 # Using scaling factor of 5 here to get the correct firing rate range
 
@@ -157,15 +158,15 @@ class FeedbackLoop(SimulatorMod):
                 summed_fr += fr
                 io.log_info(f'{gid}\t\t{fr}')
         IMG_avg_fr = summed_fr / 10.0
-        io.log_info(f'IMG firing rate avg: {avg_fr} Hz')
+        io.log_info(f'IMG firing rate avg: {IMG_avg_fr} Hz')
         
     ### STEP 3: Volume Calculations ###
         v_init = 0.0       # TODO: get biological value for initial bladder volume
-        fill = 1.75 	 	# ml/min (Asselt et al. 2017) 175 microL / min  Herrara 2010 for rat baseline 
+        fill = 0.1 	 	# ml/min (Asselt et al. 2017) 175 microL / min  Herrara 2010 for rat baseline 
         fill /= (1000 * 60) # Scale from ml/min to ml/ms
-        void = 46.0 		# 4.344 ml/min approximated from Herrera 2010; can also use 4.6 ml/min (Streng et al. 2002)
+        void = 1.2		# 4.344 ml/min approximated from Herrera 2010; can also use 4.6 ml/min (Streng et al. 2002)
         void /= (1000 * 60) # Scale from ml/min to ml/ms
-        max_v = 1.65 		# 1.65 ml based of Herrara 2010; 1.5 ml (Grill et al. 2019) #0.76
+        max_v = 0.2 	# 1.65 ml based of Herrara 2010; 1.5 ml (Grill et al. 2019) #0.76
         vol = v_init
         
         prev_vol = v_init
@@ -248,9 +249,13 @@ class FeedbackLoop(SimulatorMod):
                 for t in spikes:
                     nc.event(t)
                     
-        if self.blad_fr > 10:
+        if self.blad_fr > 10 and vol > 0.02:
             io.log_info("!!!PAG FIRING ACTIVATED!!!")
             self.pag_fr = 15
+            
+#            # To prevent PAG activity at low volumes
+#            if vol < 1.3:
+#              self.pag_fr = 0.1
             
             # To switch from filling to voiding
             self.void = True 
@@ -325,19 +330,19 @@ class FeedbackLoop(SimulatorMod):
         pc.barrier()
         
     ### STEP 6: Save Calculations ####
-        p_mmHg = 0.735559*p
+        #p_mmHg = 0.735559*p
         self._prev_glob_press = self._glob_press
-        self._glob_press = p_mmHg
+        self._glob_press = p
 
         #io.log_info('PGN firing rate = %.2f Hz' %fr)
         io.log_info('Volume = %.4f ml' %vol)
-        io.log_info('Pressure = %.2f mmHg' %p_mmHg)
+        io.log_info('Pressure = %.2f cm H2O' %p)
         io.log_info('Calculated bladder afferent firing rate for the next time step = {:.2f} Hz \n \n'.format(self.blad_fr))
 
         # Save values in appropriate lists
         self.times.append(t)
         self.b_vols.append(vol)
-        self.b_pres.append(p_mmHg)
+        self.b_pres.append(p)
 
     def finalize(self, sim):
         pass

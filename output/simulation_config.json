@@ -78,8 +78,8 @@
     }
   },
   "network": "./circuit_config.json",
-  "config_path": "/home/ifbdtk/LUT_Baseline/LUT_Prelim/jsons/simulation_config.json",
-  "config_dir": "/home/ifbdtk/LUT_Baseline/LUT_Prelim/jsons",
+  "config_path": "/home/ifbdtk/LUT_SCI_Hunter/LUT_Baseline/jsons/simulation_config.json",
+  "config_dir": "/home/ifbdtk/LUT_SCI_Hunter/LUT_Baseline/jsons",
   "components": {
     "point_neuron_models_dir": "./biophys_components/point_neuron_templates",
     "biophysical_neuron_models_dir": "./biophys_components/biophysical_neuron_templates",

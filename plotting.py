@@ -9,14 +9,14 @@ def plot_figure(means, stdevs, n_steps, dt, tstep=100, fbmod=None, savefig=True)
 
         color = 'tab:red'
         ax1_1.set_xlabel('Time (t) [ms]')
-        # ax1_1.set_ylabel('Bladder Volume (V) [ml]', color=color)
+        ax1_1.set_ylabel('Bladder Volume (V) [ml]', color=color)
         ax1_1.plot(fbmod.times, fbmod.b_vols, color=color)
         ax1_1.tick_params(axis='y', labelcolor=color)
 
         ax2_1 = ax1_1.twinx()  # instantiate a second axes that shares the same x-axis
 
         color = 'tab:blue'
-        ax2_1.set_ylabel('Bladder Pressure (P) [mmHg]', color=color)  # we already handled the x-label with ax1
+        ax2_1.set_ylabel('Bladder Pressure (P) [cm H2O]', color=color)  # we already handled the x-label with ax1
         ax2_1.plot(fbmod.times, fbmod.b_pres, color=color)
         ax2_1.tick_params(axis='y', labelcolor=color)
 
